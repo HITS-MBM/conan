@@ -1,0 +1,9 @@
+#domains for ubiquitin...
+#Gnuplot syntax (from png terminal) is understood! Spaces in names are allowed!
+# If the name does not fit in the plot, you will need to make them shorter.
+# Not all residues need to be assigned to a domain.
+ 1  6 "{/Symbol b}_1"
+11 16 "{/Symbol b}_2"
+22 35 "{/Symbol a}_1"
+40 44 "{/Symbol b}_3"
+64 72 "{/Symbol b}_4"

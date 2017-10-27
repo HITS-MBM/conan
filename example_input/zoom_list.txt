@@ -1,0 +1,6 @@
+#Each line has two residue ID's...
+42 58
+49 58
+42 48
+42 76
+ 4  8

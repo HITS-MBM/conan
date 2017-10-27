@@ -1,0 +1,86 @@
+# COMPULSORY, unless RUN_MDMAT no or REREAD! Trajectory path/filename # Supported formats .xtc, .trr, .tng
+TRAJ md.xtc
+
+# COMPULSORY, unless RUN_MDMAT no or REREAD! Coordinate path/filename # Supported format .gro, .pdb, .tpr
+COORD md.tpr
+
+# Number of levels in xpm file # Check mdmat help for more details
+NLEVEL 1501 # Default 40 - setting it higher won't affect performance
+
+# Distance at which computation of contacts shall be truncated (nm) # Check mdmat help for more	details
+TRUNC  1.5 # Default 1.5 - this will mean that the resolution is 0.001 nm.
+
+# Do you want to create an average contact matrix over time? # Check mdmat help for more details
+MEAN yes # Default 
+
+Begin at (ps) # Check mdmat help for more details
+BEGIN 0 # Default means beginning of the trajectory
+
+# End at (ps) # Check mdmat help for more details
+END   0 # Default means end of the trajectory
+
+# Compute every dt ps # Check mdmat help for more details
+DT 1000  # Default is whatever is the spacing between frames - could be expensive!
+
+# Distance cutoff for TURNING ON interactions between pairs independently from what is given to MDMAT (defined by TRUNC keyword).
+# This value has to be lower or equal to TRUNC.
+TRUNC_INTER 0.75 # Defult is what is defined by the TRUNC keyword
+
+# Distance cutoff for TURNING OFF interactions between pairs independently from what is given to MDMAT (defined by TRUNC keyword).
+# This value has to be lower or equal to TRUNC. If not given, it will be 110% of TRUNC_INTER. 
+# You can set it to be equal to TRUNC_INTER if this "buffer zone" is undesired.
+TRUNC_INTER_HIGH 0.75 # Defult is what is defined by the TRUNC keyword
+
+# This must be a number between 0 and 1 and gives the minimum amount of interaction lifetime for
+# a pair to be included in the "interaction_type" plot.
+TRUNC_LIFETIME 0.25 
+
+# Distance cutoff for differential analysis between frames. This value has to be lower or equal to TRUNC.
+TRUNC_DR 1.0 # Default is what is defined by the TRUNC keyword
+
+# Which kind of differential analysis should be done?
+# "init" = compare each frame to the initial frame,
+# "prev" = compare each frame to the preceding frame.
+# "both" = do both.
+DR_MODE both # Default is not to do it.
+
+# Path of the gnuplot parameter files directory (if nothing given, gnuplot will not be called)
+GNUS_PATH /home/user/ConAn_0.92/gnus_png
+
+# Choose if you want to run mdmat in the first place or not.
+# If "no", ConAn will look for a file called "dmf.xpm" in the workdir.
+RUN_MDMAT no # Default yes
+
+# Start drawing the map at residue = NTERM. Note that all there cannot be gaps between residue ID's.
+# NTERM 100 # Default 1
+
+# Domains file # This replaces residue number labels with the labels provided in this file. Please check example.
+DOMAINS domains.txt # This file is optional, if not given just residue index will show in the maps...
+
+# Index file # Check mdmat for more details
+# INDEX index.ndx # This file is optional. If not given, default groups of gromacs will appear
+
+# Pearson correlation coefficients will be computed between the matrix and
+# time. (to identify drifts)
+PEARSON_TIME yes
+#
+# Pearson correlation with observables. Check out the file for the format.
+# PEARSON_OBS observables_for_correlation.txt
+#
+# File that contains various stages of the simulation (possibly
+# overlapping). ConAn will compute differences between frames at the beginning and end of each stage.
+# STAGES stages.txt
+# PDB file to read in the sequence. ConAn will introduce "local interaction time" in the beta column.
+# COORD_PDB ubi.pdb
+
+MAKE_MOVIE no #default yes. can be useful to turn off for a quick analysis!
+MATRICES no #default yes. can be useful to turn off for a quick analysis!
+
+ZOOM_LIST zoom_list.txt # a file with a list of residue pairs. ConAn will show the time evolution of the distances
+                        # and whether the interaction is turned on. It will also compute correlations with all the other distances.
+
+# PCA_MAKE 10 # how many principal components should ConAn identify (can be expensive)?
+
+# K_TRAJ_CLUSTERS 2-5 # Cluster analysis on the trajectory. All frames will be assigned to a cluster.
+# K_RES_CLUSTERS 5 # Cluster analysis on the residues. All residues will be assigned to a cluster.
+

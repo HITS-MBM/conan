@@ -1,0 +1,6 @@
+#Let's divide the simulation into 5 different 10-ns stages.
+    0 10000 "Part 1/5"
+10000 20000 "Part 2/5"
+20000 30000 "Part 3/5"
+30000 40000 "Part 4/5"
+40000 50000 "Part 5/5"

@@ -1,0 +1,21 @@
+#first run directory
+RUN_A /hits/fast/mbm/dadayca/compare_ConAns/dir1
+
+#second run directory. All differences are defined as RUN_B-RUN_A !
+RUN_B /hits/fast/mbm/dadayca/compare_ConAns/dir2
+
+TITLE_A "Protein, apo"
+#default is "Run A"
+TITLE_B "Protein, holo"
+#default is "Run B"
+
+#extra cutoff, radius -- will plot/report only contacts that reach this value in at least one of the two runs.
+R_CUT 1.0
+
+#extra cutoff, lifetime -- as above (the lifetime was defined in the initial runs!)
+LIFE_CUT 0.25
+
+#PDB where the difference in "local interaction" lifetimes will be inserted
+COORD_PDB desmoplakin.pdb
+
+GNUS_PATH /home/user/ConAn_0.92/gnus_png
