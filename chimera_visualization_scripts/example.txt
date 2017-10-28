@@ -1,0 +1,10 @@
+done with k-medoids after 2 iterations!
+cost is:   366.581910
+Total number of cluster is: 2 # Line for chimera
+clusters (large to small):
+Cluster 0 has 78 elements with center at resid 878 # Line for chimera
+Cluster 1 has 34 elements with center at resid 887 # Line for chimera
+VMD selection:
+resid 866 to 892 894 to 922 1004 to 1025
+Cluster0 residues: [ 866-892, 894-922, 1004-1025, 999, 1000 ] # Line for chimera
+Cluster1 residues: [ 1008-1010, 856-887, 995-1005, 854 ] # Line for chimera
