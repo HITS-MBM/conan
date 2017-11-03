@@ -957,7 +957,7 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             stage_outf.close()
             if (gnus_path):
                 os.system('gnuplot -e "domains=0;maxz=%f;inputfile='%(trunc_dr)+"'matrices/stage_%04d_dr.dat'"%(n+1)+";outputfile='frames/stage_%04d_dr.png';title_time='%s'"%(n+1,title)+'" %s/script_dr.gnu'%(gnus_path))
-                if ('domains' in opts):
+                if (domains):
                     os.system('gnuplot -e "domains=1;maxz=%f;inputfile='%(trunc_dr)+"'matrices/stage_%04d_dr.dat'"%(n+1)+";outputfile='frames/stage_%04d_dr.domains.png';title_time='%s'"%(n+1,title)+'" %s/script_dr.gnu'%(gnus_path))
     if (interact_pair_dict):
         interact_file.close()
@@ -965,23 +965,23 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
     if (gnus_path): os.system('gnuplot -e "domains=%i" %s/aggregate.gnu'%(domains, gnus_path))
     rmsd_perframe_file.close()
     if (gnus_path): os.system('gnuplot -e "domains=%d" %s/1d_plots.gnu'%(domains,gnus_path))
-    if (make_movie and matrices and not clean_matrices and gnu_spath):
+    if (make_movie and matrices and not clean_matrices and gnus_path):
         print("Calling gnuplot for all frames... This may take a minute or two. (Aggregate plots are finished already - check them out.)")
         os.system('gnuplot -e "dr_mode=%d;domains=%d;maxz=%f;maxdr=%f;nframes=%d;begin=%d;dt=%d"'%(dr_mode,domains,trunc,trunc_dr,tn,begin,dt)
               +' %s/script_all.gnu'%(gnus_path))
     if (make_movie and gnus_path):
     # In this case we make a video using mencoder
-        os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn.mp4 "mf://frames/%05d.png"')
+        os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN.mp4 "mf://frames/%05d.png"')
         if (dr_mode in [1, 3]):
-            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn_dr.init.mp4 "mf://frames/%05d_dr.init.png"')
+            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN_dr.init.mp4 "mf://frames/%05d_dr.init.png"')
         if (dr_mode in [2, 3]):
-            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn_dr.prev.mp4 "mf://frames/%05d_dr.prev.png"')
+            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN_dr.prev.mp4 "mf://frames/%05d_dr.prev.png"')
         if (domains):
-            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn.domains.mp4 "mf://frames/%05d.domains.png"')
+            os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN.domains.mp4 "mf://frames/%05d.domains.png"')
             if (dr_mode in [1, 3]):
-                os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn_dr.init.domains.mp4 "mf://frames/%05d_dr.init.domains.png"')
+                os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN_dr.init.domains.mp4 "mf://frames/%05d_dr.init.domains.png"')
             if (dr_mode in [2, 3]):
-                os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/ConAn_dr.prev.domains.mp4 "mf://frames/%05d_dr.prev.domains.png"')
+                os.system('mencoder -vf scale=1200:1080 -ovc x264 -x264encopts bitrate=2000 -mf fps=24:type=png -oac copy -noskip -o movies/CONAN_dr.prev.domains.mp4 "mf://frames/%05d_dr.prev.domains.png"')
     print("number of frames=",len(time_vec))
     for i, vec in enumerate(vectors):
         if (len(time_vec)!=len(vec)):
