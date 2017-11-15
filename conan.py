@@ -896,7 +896,7 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
                 local_lifetime += n_int/tn
             outputf_avg_rmsf.write("%4d %4d %9.4f %9.4f\n"%(i + xterm, j + yterm, avg, std))
             avg_metric_dict0[(i, j)] = avg
-            life_metric_dict0[(i, j)] = n_int/tn
+            life_metric_dict0[(i, j)] = 1 - n_int/tn
         outputf_timeline.write("\n")
         outputf_avg_rmsf.write("\n")
         if (interact_pair_dict):
@@ -1261,10 +1261,10 @@ def print_hierarchical_clusters(dir, vectors, trunc, trunc_inter, nframes, clust
     cluster_assignment_file = open("%s/assignment.dat"%dir, "w")
     cluster_assignment = []
     for i in range(len(clusters)):
-        os.system("mkdir %s/cluster%i"%(dir, i))
         for j in clusters[i]:
             cluster_assignment.append((j, i))
         if (type == 'trj'):
+            os.system("mkdir %s/cluster%i"%(dir, i))
             avg_cluster_file = open("%s/cluster%i/average_map.dat"%(dir, i), "w")
             lifetime_file = open("%s/cluster%i/lifetime.dat"%(dir, i), "w")
             avg_dict = dict()
