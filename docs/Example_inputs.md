@@ -59,7 +59,7 @@ The "zoom list file" `zoom_list.txt` will be given as:
     5000 6000 "transition between A and B"
    Check out the file `frames/stage_0001_dr.png` for the change between 5 and 6 ns.
    
-##Statistics!
+## Statistics!
 
 CONAN can perform a few types of statistical analysis for you. In this example, we will correlate the evolution of the contact map with time and with observables.
 
