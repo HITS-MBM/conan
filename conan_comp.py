@@ -47,9 +47,9 @@ def combine_2d_files(dict_a, dict_b, pairs_filter, nterm, nres, name):
             diff = [val_b[i] - val_a[i] for i in range(nval)]
             file_triangle.write(("%5i %5i"+nval*"%15.6f"+"\n") %((n1, n2)+tuple(val)) )
             if ((n1, n2) in pairs_filter):
-                file_difference.write(("%5i %5i"+nval*"%15.6f"+"\n") %((n1, n2)+tuple(diff)) )
+                file_difference.write(("%5i %5i"+nval*" %15.6f"+"\n") %((n1, n2)+tuple(diff)) )
             else:
-                file_difference.write(("%5i %5i"+nval*"%15.6f"+"\n") %((n1, n2)+nval*(0.0, ) ) )
+                file_difference.write(("%5i %5i"+nval*" %15.6f"+"\n") %((n1, n2)+nval*(0.0, ) ) )
         file_triangle.write("\n")
         file_difference.write("\n")
     file_triangle.close()
