@@ -1834,8 +1834,8 @@ if __name__ == '__main__':
             obs_pearsonf = open(obs_pearsonfname, "w")
             minslope = 0.0
             maxslope = 0.0
-            for i in range(nterm, nterm+nres):
-                for j in range(i, nterm+nres):
+            for i in range(xterm, xterm + xres):
+                for j in range(yterm, yterm + yres):
                     if (i, j) in pairs_legend:
                         vecij = vectors[pairs_legend[i, j]]
                         if (opts.get('ignore_obs_time', False)):
@@ -1855,8 +1855,8 @@ if __name__ == '__main__':
                 if (pearsonerr):
                     break
             if (not pearsonerr):
-                for i in range(nterm, nterm+nres):
-                    for j in range(nterm, nterm+nres):
+                for i in range(xterm, xterm+xres):
+                    for j in range(yterm, yterm+yres):
                         if (i < j):
                             pair = (i, j)
                         else:
