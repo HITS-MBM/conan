@@ -110,17 +110,14 @@ def read_in_observables_blind(inputf):
             if (ntitles == -1):
                 ntitles = int(line.split()[0])
             elif (len(titles)<ntitles):
-                quotes = [i for i,j in enumerate(line) if j=='"']
-                title = line[quotes[0]+1:quotes[1]]
-                unit = line[quotes[2]+1:quotes[3]]
+                title = line
                 titles.append(title)
-                units.append(unit)
             else:
                 if (not obs_vec):
                     obs_vec = [ [] for val in range(ntitles)]
                 for n in range (0, ntitles):
                     obs_vec[n].append(float(line.split()[n+1]))
-    return titles, units, obs_vec
+    return titles, obs_vec
 
 def which(program):
 # This function checks for the existence of an executable
