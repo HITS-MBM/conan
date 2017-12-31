@@ -881,7 +881,10 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             if (first == -1):
                 first = tmax
             avg = sumr/tn
-            std = np.sqrt(sumr2/tn - avg**2)
+            if (sumr2/tn - avg**2 > 0):
+                std = np.sqrt(sumr2/tn - avg**2)
+            else:
+                std = 0.0
             outputf_timeline.write("%4d %4d %12i %12i %12.6f %12.6f %5i\n"%(i+xterm, j+yterm, first, last, n_int/tn, tmax-t0, n_enc))
             if (interact_pair_dict):
                 if (pair in interact_pair_dict and n_int/tn >= trunc_lifetime):
@@ -1173,6 +1176,7 @@ def block_analysis(vectors, nres, dt):
     b = np.array(vectors)
     i = 0
     block_outf = open("blocking/block_out.txt", "w+")
+    print("dt=",dt)
     block_outf.write("#N_iter N_blocks stderr (nm)  stderr_err (nm) corr.time est. (ps)\n")
     while (len(b) >= 2):
         sems = sem(b)
@@ -1656,7 +1660,7 @@ if __name__ == '__main__':
 # Set default value if none given:
     opts = {'trunc' : None, 'mean' : True, 'run_mdmat' : True, 'nterm' : 1, 'matrices' : True, 'dr_mode' : 0, 'trunc_lifetime' : 0.5, 'asymm' : False, 'clean_matrices' : False, 'dimer': False,
         'make_movie': True, 'trunc_dr': None, 'trunc_inter': None, 'trunc_inter_high': None, 'domains' : 0, 'begin' : None, 'dt': None, 'end': None, 'patch_time': False, 'economy': False,
-        'pearson_inter': False, 'reread': False, 'indexf': None, 'zoom': False}
+        'pearson_inter': False, 'reread': False, 'indexf': None, 'zoom': False, 'nlevels': None}
     if len(sys.argv)!=2:
         print('Usage: You need to provide a single text file in which specify all the options for creating a matrix!')
     finput=open(sys.argv[1])
@@ -1746,7 +1750,7 @@ if __name__ == '__main__':
     else:
         begin, dt_read, time_vec, pairs_list, pairs_legend, vectors, avg_metric_dict0, life_metric_dict0, density_r2_metric, total_interact_dict_x, total_interact_dict_y = read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, trunc, trunc_inter, trunc_inter_high,
                                                                                   begin, end, dt, patch_time, gnus_path, dr_mode, domains, pearson_inter, economy, dimer, reread, stages_list, interact_pair_dict, trunc_lifetime)
-    if ('dt' not in opts):
+    if (opts['dt'] == None):
         dt = dt_read
     if (not reread):
         inputf.close()
@@ -1785,7 +1789,6 @@ if __name__ == '__main__':
     
     if (gnus_path): os.system('gnuplot -e "domains=%d" %s/1d_plots.gnu'%(domains,gnus_path))
     
-    
     pearsonerr = False
     if ('pearson_time' in opts):
         pearsonf = open("aggregate/pearson_data.dat","w")
@@ -1799,10 +1802,12 @@ if __name__ == '__main__':
                         print("Pearson error! Wrong number of frames.", len(rvec), len(time_vec))
                         print(i, j)
                         print(pairs_legend[i, j])
-                        #print(rvec)
                         print(pairs_legend)
                         break
-                    slope, intercept, rvalue, pvalue, std_err = linregress(time_vec, rvec)
+                    if (len(set(rvec)) > 1):
+                        slope, intercept, rvalue, pvalue, std_err = linregress(time_vec, rvec)
+                    else:
+                        slope, intercept, rvalue, pvalue, std_err = (0, 0, 0, 0, 0)
                 else:
                     rvalue = 0.0
                     slope = 0.0
@@ -1846,7 +1851,10 @@ if __name__ == '__main__':
                         if (pearsonerr):
                             print("Pearson error! Wrong number of frames."," len (rvec) = %i len(obs) = %i"%(len(rvec), len(obs)) )
                             break
-                        slope, intercept, pears_r, pvalue, std_err = linregress(rvec, obs)
+                        if (len(set(rvec)) > 1):
+                            slope, intercept, pears_r, pvalue, std_err = linregress(obs, rvec)
+                        else:
+                            slope, intercept, pears_r, pvalue, std_err = (0, 0, 0, 0, 0)
                     else:
                         pears_r = 0.0
                         slope = 0
