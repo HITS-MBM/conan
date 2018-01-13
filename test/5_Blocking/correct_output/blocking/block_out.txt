@@ -1,0 +1,4 @@
+#N_iter N_blocks stderr (nm)  stderr_err (nm) corr.time est. (ps)
+    0        11    3.177e-02    7.105e-03         100000.00
+    1         5    3.669e-02    1.297e-02         133350.52
+    2         2    3.903e-02    2.760e-02         150877.13

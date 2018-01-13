@@ -750,12 +750,9 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             begin = time0
     if (asymm):
         total_interactionf_x = open("aggregate/total_interactions.x.dat","w")
-        total_interactionf_x.write("%i\n"%xres)
         total_interactionf_y = open("aggregate/total_interactions.y.dat","w")
-        total_interactionf_y.write("%i\n"%yres)
     else:
         local_interactionf = open("aggregate/local_interactions.dat","w")
-        local_interactionf.write("%i\n"%nres)
     while (time > float('-Inf') and time <=end):
         if (time >= begin and ((time-begin) % dt == 0)):
             npairs = vectors.shape[0]
@@ -922,7 +919,7 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             int_i = sum(vec_i)/tn
             if (int_i > 0):
                 int_i /= len([x for x in vec_i if x > 0])
-            local_interactionf.write("%5i%12.6f\n"%(i, int_i))
+            local_interactionf.write("%5i%12.6f\n"%(i + nterm, int_i))
             local_interact_dict[nterm + i] = int_i
         local_interactionf.close()
     outputf_timeline.close()

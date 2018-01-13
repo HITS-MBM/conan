@@ -1,0 +1,4 @@
+TRAJ ../sample.xtc
+COORD ../md.tpr
+TRUNC 1.0
+NLEVEL 1001

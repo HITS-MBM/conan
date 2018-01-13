@@ -1,0 +1,4 @@
+#Blocking analysis.
+RUN_MDMAT no
+BLOCKING yes
+MATRICES no

@@ -1,0 +1,8 @@
+#Asymmetric mode.
+RUN_MDMAT no
+NRES_X 14
+NRES_Y 14
+NTERM_X 1
+NTERM_Y 15
+START_X 1
+START_Y 15

@@ -1,0 +1,4 @@
+#Framewise cluster analysis.
+RUN_MDMAT no
+K_TRAJ_CLUSTERS 1-3
+MATRICES no

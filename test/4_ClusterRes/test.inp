@@ -1,0 +1,4 @@
+#Residue-wise cluster analysis.
+RUN_MDMAT no
+K_RES_CLUSTERS 1-3
+MATRICES no

@@ -1,0 +1,7 @@
+#Correlation analysis
+RUN_MDMAT no
+PEARSON_TIME yes
+PEARSON_INTER yes
+PEARSON_OBS observable.dat
+MATRICES no
+MAKE_MOVIE no

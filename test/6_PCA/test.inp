@@ -1,0 +1,4 @@
+#Principal component analysis.
+RUN_MDMAT no
+PCA_MAKE 10
+MATRICES no
