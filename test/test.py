@@ -78,7 +78,7 @@ if (total_fails == 0):
   print("All tests passed! Everything looks good.")
   os.system("rm 1_ReadWrite/{dmf.xpm,dm.xpm}")
 else:
-  print("%i test(s) failed. The output of the failed tests has been preserved.")
+  print("%i test(s) failed. The output of the failed tests has been preserved."%len(failures))
   print("It is possible that the deviations are minor.")
   print("The failures are in the following folders:")
   for failure in failures:
