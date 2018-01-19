@@ -1,0 +1,8 @@
+DT 5000
+TRUNC  1.0
+TRUNC_INTER 0.5
+TRUNC_DR 0.5
+DR_MODE prev
+GNUS_PATH ../../gnuplot_inputscripts
+RUN_MDMAT no
+DOMAINS domains.txt

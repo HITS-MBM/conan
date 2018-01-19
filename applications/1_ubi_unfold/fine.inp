@@ -1,0 +1,13 @@
+TRAJ pull_500ps.xtc
+COORD pull.tpr
+NLEVEL 1001
+DT 500
+TRUNC  1.0
+TRUNC_INTER 0.5
+TRUNC_DR 1.0
+DR_MODE init
+GNUS_PATH ../../gnuplot_inputscripts
+RUN_MDMAT yes
+DOMAINS domains.txt
+COORD_PDB ubi.pdb
+K_TRAJ_CLUSTERS 1-5

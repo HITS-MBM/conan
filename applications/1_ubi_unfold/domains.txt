@@ -1,0 +1,6 @@
+#domains for ubiquitin...
+ 1  6 "{/Symbol b}_1"
+11 16 "{/Symbol b}_2"
+22 35 "{/Symbol a}_1"
+40 44 "{/Symbol b}_3"
+64 72 "{/Symbol b}_4"
