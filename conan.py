@@ -1941,7 +1941,7 @@ if __name__ == '__main__':
         if (asymm):
             norm = np.sqrt(xres*yres)
         else:
-            norm = nres
+            norm = nres/np.sqrt(2.0)
         if (dimer):
             print("Dimer mode is turned on. The cluster analysis could be unbearably slow.")
             npad, map = prepare_dimer_transpose(pairs_list, pairs_legend)
