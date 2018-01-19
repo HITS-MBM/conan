@@ -1397,7 +1397,7 @@ def rmsd_frame(dict_a, dict_b, trunc, xres, yres, asymm, dimer):
     if (asymm):
         return math.sqrt(sum2/(xres*yres))
     else:
-        return math.sqrt(2*sum2)/nres
+        return math.sqrt(sum2)/nres
 # In[ ]:
 
 # Function to check the input file for mdmat and run mdmat
