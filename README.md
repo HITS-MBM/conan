@@ -3,8 +3,8 @@ Requirements
 
 In order to successfully run CONAN you need to have working installations of:
 
- - Python 3, with numpy and scipy installed.
- - GROMACS molecular dynamics engine version 5.0 or later. GROMACS can be downloaded from the official website. (NB: GROMACS is only used for the first step of analysis, the MD trajectory can be obtained by other programs too.)
+ - Python 3, with numpy and scipy installed. (Anaconda 3+ recommended).
+ - GROMACS molecular dynamics engine, version 5.0 or later. GROMACS can be downloaded from the official website. (NB: GROMACS is only used for the first step of analysis, the MD trajectory can be obtained by other programs too.)
  - Gnuplot plotting tool. It can be downloaded from the official website.
  - Mencoder is obtained through MPlayer, which can be found on the official website.
 
@@ -29,7 +29,30 @@ The memory requirements of CONAN are usually not too extreme, since data storage
 
 In general, it is a good idea to run CONAN on a subset of your data (setting `DT` high, or restricting `BEGIN` or `END` to a part of the simulation) before running it on the entire set.
 
+Testing CONAN
+-------------
+
+You can test your CONAN distribution by:
+
+    cd test/
+    ./test.py
+
+And read the results on the screen. The test script cleans up after itself, unless there are errors.
+
+CONAN tutorials
+-------------
+
+There are some sample applications (input files and trajectories) in the folder `applications/`. 
+Check out our tutorials on https://contactmaps.blogspot.de/ for step-by-step instructions.
+
+Also check out other example input files that you can use on your own trajectories at https://github.com/HITS-MBM/conan/blob/master/docs/Example_inputs.md
+
 Using parts of CONAN
 -------------
 
 You can use CONAN as a library by `import conan` in a Python script. The variable names are relatively easy to understand, although not everything is 100% user-friendly at the moment.
+
+Where to reach us?
+-------------
+
+You can contact me (Csaba) at csaba.daday at h-its.org. Check out the blog at https://contactmaps.blogspot.de/ and the YouTube channel at https://tinyurl.com/Con4nMD .
