@@ -1397,7 +1397,7 @@ def rmsd_frame(dict_a, dict_b, trunc, xres, yres, asymm, dimer):
     if (asymm):
         return math.sqrt(sum2/(xres*yres))
     else:
-        return math.sqrt(sum2)/nres
+        return math.sqrt(2*sum2)/nres
 # In[ ]:
 
 # Function to check the input file for mdmat and run mdmat
@@ -1941,7 +1941,7 @@ if __name__ == '__main__':
         if (asymm):
             norm = np.sqrt(xres*yres)
         else:
-            norm = np.sqrt(2)*nres
+            norm = nres
         if (dimer):
             print("Dimer mode is turned on. The cluster analysis could be unbearably slow.")
             npad, map = prepare_dimer_transpose(pairs_list, pairs_legend)
