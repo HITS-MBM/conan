@@ -1879,9 +1879,8 @@ if __name__ == '__main__':
         vectors_mean0 = np.zeros([0, nframes], dtype = np.float16)
         print("There are a total of %i non-constant pairs."%len(vectors))
         print("Removing means....")
-        for vec in vectors:
-            meanvec = np.full(len(vec), np.average(vec), dtype = np.float16)
-            vectors_mean0 = np.vstack([vectors_mean0, np.array(vec) - meanvec])
+        vecsize = vectors.shape
+        vectors_mean0 = vectors - np.transpose(np.broadcast_to (np.average(vectors, axis=1), vecsize[::-1]) )
         print("Building covariance matrix....")
         covmat = np.cov(vectors)
         print("Done.")
