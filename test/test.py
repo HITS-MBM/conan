@@ -40,7 +40,7 @@ for prog in ["gmx", "mencoder", "gnuplot"]:
 print ("Test 1: I/O, Result: ", end = '')
 os.chdir("1_ReadWrite") # the first test, getting us the actual data.
 os.system("echo 2 | ../../conan.py test.inp > /dev/null >& /dev/null")
-i = os.system("python ../compare_all.py ")
+i = os.system("../compare_all.py ")
 if (i==0):
   print ("PASSED")
 else:
