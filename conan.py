@@ -1629,6 +1629,9 @@ def read_options(finput, opts):
         if ('pearson_time' in opts):
             print("Pearson correlation with time is not available in economy mode.")
             opts.pop('pearson_time')
+        if ('pearson_obs_str' in opts):
+            print("Pearson correlation with time is not available in economy mode.")
+            opts.pop('pearson_obs_str')
     return opts
 
 def adjust_truncs(trunc, trunc_dr, trunc_inter, trunc_inter_high):
