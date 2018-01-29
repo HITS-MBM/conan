@@ -1630,7 +1630,7 @@ def read_options(finput, opts):
             print("Pearson correlation with time is not available in economy mode.")
             opts.pop('pearson_time')
         if ('pearson_obs_str' in opts):
-            print("Pearson correlation with time is not available in economy mode.")
+            print("Pearson correlation with an observable is not available in economy mode.")
             opts.pop('pearson_obs_str')
     return opts
 
@@ -1922,22 +1922,22 @@ if __name__ == '__main__':
     
     if ('k_res_clusters' in opts):
         os.system('mkdir -v cluster_res')
-        print("Attempting k-medoids based on interaction lifetimes...")
+        print("Attempting hierarchical clustering on residues based on interaction lifetimes...")
         os.system('mkdir -v cluster_res/lifetime')
         life_cond = get_condensed_distances(life_metric_dict0, 0, xres)
         call_hierarchical("cluster_res/lifetime", vectors, trunc, trunc_inter, life_cond, xres, ks_res, "lifetime", None, 'res', xterm, xres, yterm, yres, asymm, matrices)
-        print("Attempting k-medoids based on simple distances...")
+        print("Attempting hierarchical clustering on residues based on simple distances...")
         os.system('mkdir -v cluster_res/distance')
         dist_cond = get_condensed_distances(avg_metric_dict0, 0, xres)
         call_hierarchical("cluster_res/distance", vectors, trunc, trunc_inter, dist_cond, xres, ks_res, "distance", None, 'res', xterm, xres, yterm, yres, asymm, matrices)
         if (opts.get('pearson_inter', False)):
-            print("Attempting k-medoids based on inter-residue cross-correlation...")
+            print("Attempting hierarchical clustering on residues based on inter-residue cross-correlation...")
             os.system('mkdir -v cluster_res/crosscorr')
             crosscorr_cond = get_condensed_distances(density_r2_metric, 0, xres)
             call_hierarchical("cluster_res/crosscorr", vectors, trunc, trunc_inter, crosscorr_cond, xres, ks_res, "distance", None, 'res', xterm, xres, yterm, yres, asymm, matrices)
     
     if ('k_traj_clusters' in opts):
-        print("Starting contact map-based cluster analysis")
+        print("Starting contact map-based cluster analysis...")
         print("")
         os.system("mkdir -p cluster_trj")
         if (asymm):
