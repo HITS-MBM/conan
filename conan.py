@@ -511,7 +511,7 @@ def read_frame(inputf, nres, nlevels, nchar, dict_legend, nterm, trunc, asymm_da
     dict_frame = dict()
     
     if (asymm_data):
-        start_x, start_y, xres, yres, xterm, yterm = asymm_data
+        xdict, ydict, xres, yres, xterm, yterm = asymm_data
 
     #skip all the stuff with /* comments...
     
@@ -551,8 +551,8 @@ def read_frame(inputf, nres, nlevels, nchar, dict_legend, nterm, trunc, asymm_da
                 linestr = line[1:-2]
             z = [dict_legend[linestr[k:k+nchar]] for k in range(0, nres * nchar, nchar)]
             for m in range(nres):
-                if (z[m] < trunc and ( (m+1) in range(start_x, start_x+xres)) and ( (n+1) in range(start_y, start_y+yres)) ):
-                    dict_frame[(m + 1 + xterm - start_x, n + 1 + yterm - start_y)] = z[m]
+                if (z[m] < trunc and ( m+1 in xdict ) and ( n+1 in ydict) ):
+                    dict_frame[(xdict[m+1], ydict[n+1])] = z[m]
             line = inputf.readline()
             n=n-1
     
@@ -690,13 +690,13 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             
     asymm = bool(asymm_data)
     if (asymm):
-        start_x, start_y, xres, yres, xterm, yterm = asymm_data
+        xdict, ydict, xres, yres, xterm, yterm = asymm_data
         interaction_map_x = [[] for x in range(xres)]
         interaction_map_y = [[] for x in range(yres)]
         total_interact_dict_x = dict()
         total_interact_dict_y = dict()
     else:
-        start_x, start_y, xres, yres, xterm, yterm = (1, 1, nres, nres, nterm, nterm)
+        xdict, ydict, xres, yres, xterm, yterm = (None, None, nres, nres, nterm, nterm)
         interaction_map = [[] for x in range(nres)]
         local_interact_dict = dict()
     if (inputf):
@@ -1426,6 +1426,7 @@ def read_index_folder(reread):
     nterm = 1
     trunc = 1.5
     nres = None
+    asymm_keys = dict()
     for line in finput:
         if line.strip().startswith('#') or len(line.split())<2:
             continue
@@ -1438,9 +1439,27 @@ def read_index_folder(reread):
                 nterm = int(val)
             elif key == 'NRES':
                 nres = int(val)
+            elif key == 'NTERM_X':
+                asymm_keys['xterm'] = int(val)
+            elif key == 'NRES_X':
+                asymm_keys['xres'] = int(val)
+            elif key == 'NTERM_Y':
+                asymm_keys['yterm'] = int(val)
+            elif key == 'NRES_Y':
+                asymm_keys['yres'] = int(val)
             elif key == 'TRUNC':
                 trunc = float(val)
-    return asymm, nterm, nres, trunc
+    if (asymm):
+        required_keys = {'xterm': 'NTERM_X', 'xres': 'NRES_X', 'yterm': 'NTERM_Y', 'yres': 'NRES_Y'}
+        for key in required_keys:
+            if (key not in asymm_keys):
+                print("Key not found in index.dat: %s !"%required_keys[key])
+                print("Try again, giving all of the following keys: %s"%" ".join(required_keys.values()))
+                sys.exit()
+    else:
+        if (nres==None):
+            print("You need to give at least NRES in the index.dat file.")
+    return asymm, nterm, nres, trunc, asymm_keys
     
 def read_options(finput, opts):
     opts['trunc_given'] = False
@@ -1520,6 +1539,12 @@ def read_options(finput, opts):
             elif key == 'NTERM_Y':
                 opts['yterm'] = int(val)
                 opts['asymm'] = 1
+            elif key == 'LIST_X':
+                opts['asymm'] = 1
+                opts['list_x'] = str(val)
+            elif key == 'LIST_Y':
+                opts['asymm'] = 1
+                opts['list_y'] = str(val)
             elif key == 'PEARSON_TIME':
                 opts['pearson_time'] = (val == 'yes')
             elif key == 'PEARSON_INTER':
@@ -1603,6 +1628,26 @@ def read_options(finput, opts):
         if (opts.get('pearson_inter', False)):
             print("Inter-residue cross-correlation is impossible in an asymmetric run.")
             opts['pearson_inter'] = False
+        if ('list_x' in opts):
+            reslistx = np.loadtxt(opts['list_x'], dtype = int)
+            opts['xterm'] = opts.get('xterm', reslistx[0]) 
+            opts['xdict'] = {b: opts['xterm'] + a - 1 for (a, b) in enumerate(reslistx)}
+            opts['xres'] = len(reslistx)
+            if ('start_x' in opts):
+                print("You cannot give a range AND a list for the residue list. We will only use the list.")
+                opts.pop('start_x')
+        if ('list_y' in opts):
+            reslisty = np.loadtxt(opts['list_y'], dtype = int)
+            opts['yterm'] = opts.get('yterm', reslisty[0])
+            opts['ydict'] = {b: opts['yterm'] + a - 1 for (a, b) in enumerate(reslisty)}
+            opts['yres'] = len(reslisty)
+            if ('start_y' in opts):
+                print("You cannot give a range AND a list for the residue list. We will only use the list.")
+                opts.pop('start_y')
+        if ('start_x' in opts):
+            opts['xdict'] = {opts['start_x'] + i : opts['xterm'] + i for i in range(opts['xres'])}
+        if ('start_y' in opts):
+            opts['ydict'] = {opts['start_y'] + i : opts['yterm'] + i for i in range(opts['yres'])}
     if ('pca_make' in opts) and ('pca_dir' in opts):
         print("PCA can either be performed or PC's can be read in, but not both. We will attempt reading them in.")
         opts.pop('pca_make')
@@ -1672,7 +1717,9 @@ if __name__ == '__main__':
     asymm_data = None
     if (asymm):
         print("Asymmetric run found!")
-        asymm_data = start_x, start_y, xres, yres, xterm, yterm
+        asymm_data = xdict, ydict, xres, yres, xterm, yterm
+        print("Dictionary for x residues:", xdict)
+        print("Dictionary for y residues:", ydict)
     if ('coordpdb' in opts and asymm):
         pdbf = opts.get('pdbf', '')
         pdbx = opts.get('pdbx', '')
@@ -1710,8 +1757,18 @@ if __name__ == '__main__':
         inputf.close()
         inputf = open('dmf.xpm')
     else:
-        asymm, nterm, nres, trunc = read_index_folder(reread)
-        print ("asymm, nterm, nres, trunc", asymm, nterm, nres, trunc)
+        asymm, nterm, nres, trunc, asymm_keys = read_index_folder(reread)
+        if (not asymm):
+            print ("asymm, nterm, nres, trunc", asymm, nterm, nres, trunc)
+        else:
+            xterm = asymm_keys['xterm']
+            yterm = asymm_keys['yterm']
+            xres = asymm_keys['xres']
+            yres = asymm_keys['yres']
+            start_x = 1
+            start_y = 1
+            print ("asymm, xterm, xres, yterm, yres, trunc", asymm, xterm, xres, yterm, yres, trunc)
+            asymm_data = 1, 1, xres, yres, xterm, yterm
         inputf = None
         nlevels = None
         nchar = None
@@ -1738,7 +1795,6 @@ if __name__ == '__main__':
             domainf_x = open(domainf_xn)
             domainf_y = open(domainf_yn)
             create_tics_asymm(domainf_x, domainf_y, xterm, xres, yterm, yres)
-
     stages_list = None
     if ('stages' in opts):
         stage_file = open(stagef)
