@@ -672,6 +672,27 @@ def plot_frames(dict_frame, first_frame, prev_frame, pairs_list, dr_mode, xterm,
                     os.system("rm matrices/%05d_dr.prev.dat"%n)
     print("done with frame corresponding to ",time,"ps",end="\r")
     
+def get_inter(residue_vectors, nterm, nres, pearson_2d_density_file):
+#this is the computation and output of inter-residue Pearson correlation (either symmetric or asymmetric).
+    results_inter = []
+    for i in range(nres):
+        for j in range(i+1, nres):
+            slope, intercept, r, pvalue, std_err = linregress(residue_vectors[i], residue_vectors[j])
+            results_inter.append(r)
+            density_r2_metric[(i, j)] = 1 - r**2
+            density_r2_metric[(j, i)] = 1 - r**2
+    for i in range(nres):
+        for j in range(nres):
+            if (i == j):
+                r = 1.0
+            elif (i < j):
+                r = results_inter[cond_index(i, j, nres)]
+            else:
+                r = results_inter[cond_index(j, i, nres)]
+            pearson_2d_density_file.write("%5i %5i %15.6f\n"%(nterm + i, nterm + j, r))
+        pearson_2d_density_file.write("\n")
+    return density_r2_metric
+
 def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, trunc, trunc_inter, trunc_inter_high, begin, end, dt, patch_time, gnus_path,
                         dr_mode, domains, pearson_inter, economy, dimer, reread, stages_list, interact_pair_dict, trunc_lifetime):
     outputf_timeline = open("aggregate/timeline.dat", "w")
@@ -712,7 +733,11 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
     if (interact_pair_dict):
         interact_file = open("aggregate/interaction_types.dat", 'w')
     if (pearson_inter):
-        residue_vectors = np.zeros([nres,0])
+        if (asymm):
+            residue_vectors_x = np.zeros([xres,0])
+            residue_vectors_y = np.zeros([yres,0])
+        else:
+            residue_vectors = np.zeros([nres,0])
     aggregates = np.zeros([0, 7]) # aggregate values for all pairs
     empty_aggregate = np.array([-1, 0, 0, 0, 0, 0, 0]) #first, last, lifetime, N_encounter, status, sumr, sumr2
     n = 0
@@ -758,7 +783,11 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             npairs = vectors.shape[0]
             frame_column = np.zeros([npairs, 1], dtype = np.float16)
             if (pearson_inter):
-                residue_column = np.zeros([nres, 1])
+                if (asymm):
+                    residue_column_x = np.zeros([xres, 1])
+                    residue_column_y = np.zeros([yres, 1])
+                else:
+                    residue_column = np.zeros([nres, 1])
             if (reread):
                 inputf = open(matrixfiles[n])
                 dict_frame = read_matrix(inputf, xterm, xres, yterm, yres, asymm, trunc)
@@ -812,8 +841,12 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
                     native_list.append(i)
                 if (pearson_inter):
                     weight = weight_contacts(r, trunc)
-                    residue_column[pair[0] - nterm] += weight
-                    residue_column[pair[1] - nterm] += weight
+                    if (asymm):
+                        residue_column_x[pair[0] - xterm] += weight
+                        residue_column_y[pair[1] - yterm] += weight
+                    else:
+                        residue_column[pair[0] - nterm] += weight
+                        residue_column[pair[1] - nterm] += weight
             total_contacts = sum(aggregates[:, 4])
             native         = sum(aggregates[native_list, 4])
             non_native     = total_contacts - native
@@ -821,7 +854,11 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             n += 1
             emptiness = trunc * np.ones([1, n], dtype = np.float16)
             if (pearson_inter):
-                residue_vectors = np.hstack([residue_vectors, residue_column])
+                if (asymm):
+                    residue_vectors_x = np.hstack([residue_vectors_x, residue_column_x])
+                    residue_vectors_y = np.hstack([residue_vectors_y, residue_column_y])
+                else:
+                    residue_vectors = np.hstack([residue_vectors, residue_column])
             empty_aggregate = np.array([-1, 0., 0., 0., 0., n*trunc, n*trunc**2])
         if (reread):
             if (n == len(matrixfiles)):
@@ -836,25 +873,19 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
                 time = time_tmp
     density_r2_metric = dict()
     if (pearson_inter):
-        results_inter = []
-        for i in range(nres):
-            for j in range(i+1, nres):
-                slope, intercept, r, pvalue, std_err = linregress(residue_vectors[i], residue_vectors[j])
-                results_inter.append(r)
-                density_r2_metric[(i, j)] = 1 - r**2
-                density_r2_metric[(j, i)] = 1 - r**2
-        pearson_2d_density_file = open("aggregate/pearson_map_density.dat", "w")
-        for i in range(nres):
-            for j in range(nres):
-                if (i == j):
-                    r = 1.0
-                elif (i < j):
-                    r = results_inter[cond_index(i, j, nres)]
-                else:
-                    r = results_inter[cond_index(j, i, nres)]
-                pearson_2d_density_file.write("%5i %5i %15.6f\n"%(nterm + i, nterm + j, r))
-            pearson_2d_density_file.write("\n")
-        pearson_2d_density_file.close()
+        if (asymm):
+            filex = open("aggregate/pearson_map_density.x.dat", "w")
+            get_inter(residue_vectors_x, xterm, xres, filex)
+            filex.close()
+            filey = open("aggregate/pearson_map_density.y.dat", "w")
+            get_inter(residue_vectors_y, yterm, yres, filey)
+            filey.close()
+        else:
+            filesymm = open("aggregate/pearson_map_density.y.dat", "w")
+            density_r2_metric = get_inter(residue_vectors_y, yterm, yres, filesymm)
+            filesymm.close()
+
+
     print("")
     t0 = time_vec[0]
     tmax = time_vec[-1]
@@ -1625,9 +1656,6 @@ def read_options(finput, opts):
         if ('k_clusters' in opts):
             print("Clustering residues is impossible in an asymmetric run.")
             opts.pop('k_clusters')
-        if (opts.get('pearson_inter', False)):
-            print("Inter-residue cross-correlation is impossible in an asymmetric run.")
-            opts['pearson_inter'] = False
         if ('list_x' in opts):
             reslistx = np.loadtxt(opts['list_x'], dtype = int)
             opts['xterm'] = opts.get('xterm', reslistx[0]) 
@@ -1841,7 +1869,11 @@ if __name__ == '__main__':
             inputpdb_y.close()
             outputpdb_y.close()
     if opts.get('pearson_inter', False) and gnus_path:
-        os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.dat'"+";outputfile='aggregate/pearson_inter_residue.png';title_time='Inter-residue Pearson correlation'"+'" %s/script_corr.gnu'%(gnus_path))
+        if (asymm):
+            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.x.dat'"+";outputfile='aggregate/pearson_inter_residue.x.png';title_time='Inter-residue Pearson correlation (X)'"+'" %s/script_corr.gnu'%(gnus_path))
+            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.y.dat'"+";outputfile='aggregate/pearson_inter_residue.y.png';title_time='Inter-residue Pearson correlation (Y)'"+'" %s/script_corr.gnu'%(gnus_path))
+        else:
+            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.dat'"+";outputfile='aggregate/pearson_inter_residue.png';title_time='Inter-residue Pearson correlation'"+'" %s/script_corr.gnu'%(gnus_path))
     
     if (gnus_path): os.system('gnuplot -e "domains=%d" %s/1d_plots.gnu'%(domains,gnus_path))
     
