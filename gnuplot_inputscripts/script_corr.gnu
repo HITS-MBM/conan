@@ -55,7 +55,11 @@ splot inputfile u 1:2:( abs($3) > maxz ? maxz*$3/abs($3) : $3) notitle
 
 
 if (domains==1) {
-  load "domains.gnu"
+  if (exists("domain_name")){
+    load domain_name
+  } else {
+    load "domains.gnu"
+  }
   unset xlabel
   unset ylabel
   set grid noxtics noytics mxtics mytics

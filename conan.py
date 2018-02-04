@@ -196,7 +196,10 @@ def zoom_on_pair(pair, rvec, time_vec, trunc, inter_low, inter_high, pairs_list,
     for i in range(len(pairs_list)):
         pair2 = pairs_list[i]
         rvec2 = vectors[i]
-        rvalue, pvalue = pearsonr(rvec, rvec2)
+        if (len(set(rvec)) > 1 and len(set(rvec2)) > 1):
+            rvalue, pvalue = pearsonr(rvec, rvec2)
+        else:
+            rvalue = 0.0
         pearson2d_dict[pair2] = rvalue 
         pearson2d_dict[pair2[::-1]] = rvalue 
     for i in range(xterm, xterm+xres):
@@ -313,13 +316,13 @@ def read_stages(stagef):
                 stages_list.append( (t1, t2, "Stage %d"%(len(stages_list)+1) ) )
     return stages_list
 
-def create_tics(domainf, nterm, nres):
+def create_tics(domainf, nterm, nres, name_2d = "domains.gnu", name_1d = "domains_1d.gnu"):
 #This function creates the tics for the domains file for gnuplot.
-    gnuf_1d = open("domains_1d.gnu","w")
-    gnuf_2d = open("domains.gnu","w")
+    gnuf_1d = open(name_1d,"w")
+    gnuf_2d = open(name_2d,"w")
+    
     rmin = nterm
-    rmax = nterm+nres-1
-
+    rmax = nterm + nres - 1
     mtics = []
     tics  = []
 
@@ -332,7 +335,6 @@ def create_tics(domainf, nterm, nres):
             mtics       = mtics + [i1 - 0.5, i2 + 0.5]
     mtics_copy = set(mtics)
     mtics = set(mtics)
-
     for i in mtics_copy:
         if (i < rmin or i > rmax):
             mtics.remove(i)
@@ -353,9 +355,8 @@ def create_tics(domainf, nterm, nres):
     gnuf_1d.close()
 
 def create_tics_asymm(domainf_x, domainf_y, xterm, xres, yterm, yres):
-    gnuf_1dx = open("domains_1d.x.gnu","w")
-    gnuf_1dy = open("domains_1d.y.gnu","w")
     gnuf_2d = open("domains.gnu","w")
+
     rminx = xterm
     rmaxx = xterm+xres-1
     rminy = yterm
@@ -399,22 +400,15 @@ def create_tics_asymm(domainf_x, domainf_y, xterm, xres, yterm, yres):
     ytics_str  = ", ".join(['"%s" %.1f'%i for i in ytics])
     xtics_str = "set xtics (" + xtics_str + ")\n"
     ytics_str2d = "set ytics (" + ytics_str + ")\n"
-    ytics_str1d = "set xtics (" + ytics_str + ")\n"
 
     gnuf_2d.write(xtics_str)
-    gnuf_1dx.write(xtics_str)
     gnuf_2d.write(ytics_str2d)
-    gnuf_1dy.write(ytics_str1d)
 
     for i in mxtics:
         gnuf_2d.write("set xtics add (%.1f 1) \n"%(i))
-        gnuf_1dx.write("set xtics add (%.1f 1) \n"%(i))
     for i in mytics:
         gnuf_2d.write("set ytics add (%.1f 1) \n"%(i))
-        gnuf_1dy.write("set xtics add (%.1f 1) \n"%(i))
     gnuf_2d.close()
-    gnuf_1dx.close()
-    gnuf_1dy.close()
 
 def plot_pc (xterm, xres, yterm, yres, ii, vec, pairs, pairs_dict, gnus_path, domains):
     pc_file = open("pca/pc.%i.dat"%(ii+1), "w+")
@@ -675,16 +669,23 @@ def plot_frames(dict_frame, first_frame, prev_frame, pairs_list, dr_mode, xterm,
 def get_inter(residue_vectors, nterm, nres, pearson_2d_density_file):
 #this is the computation and output of inter-residue Pearson correlation (either symmetric or asymmetric).
     results_inter = []
+    density_r2_metric = dict()
     for i in range(nres):
         for j in range(i+1, nres):
-            slope, intercept, r, pvalue, std_err = linregress(residue_vectors[i], residue_vectors[j])
+            if (len(set(residue_vectors[i])) > 1 and len(set(residue_vectors[j])) > 1):
+                slope, intercept, r, pvalue, std_err = linregress(residue_vectors[i], residue_vectors[j])
+            else:
+                r = 0.0
             results_inter.append(r)
             density_r2_metric[(i, j)] = 1 - r**2
             density_r2_metric[(j, i)] = 1 - r**2
     for i in range(nres):
         for j in range(nres):
             if (i == j):
-                r = 1.0
+                if (len(set(residue_vectors[i])) > 1):
+                    r = 1.0
+                else:
+                    r = 0.0
             elif (i < j):
                 r = results_inter[cond_index(i, j, nres)]
             else:
@@ -881,8 +882,8 @@ def read_process_frames(inputf, nres, nlevels, nchar, dict_legend, asymm_data, t
             get_inter(residue_vectors_y, yterm, yres, filey)
             filey.close()
         else:
-            filesymm = open("aggregate/pearson_map_density.y.dat", "w")
-            density_r2_metric = get_inter(residue_vectors_y, yterm, yres, filesymm)
+            filesymm = open("aggregate/pearson_map_density.dat", "w")
+            density_r2_metric = get_inter(residue_vectors, nterm, nres, filesymm)
             filesymm.close()
 
 
@@ -1746,8 +1747,6 @@ if __name__ == '__main__':
     if (asymm):
         print("Asymmetric run found!")
         asymm_data = xdict, ydict, xres, yres, xterm, yterm
-        print("Dictionary for x residues:", xdict)
-        print("Dictionary for y residues:", ydict)
     if ('coordpdb' in opts and asymm):
         pdbf = opts.get('pdbf', '')
         pdbx = opts.get('pdbx', '')
@@ -1823,6 +1822,10 @@ if __name__ == '__main__':
             domainf_x = open(domainf_xn)
             domainf_y = open(domainf_yn)
             create_tics_asymm(domainf_x, domainf_y, xterm, xres, yterm, yres)
+            domainf_x.seek(0)
+            domainf_y.seek(0)
+            create_tics(domainf_x, xterm, xres, name_1d = "domains_1d.x.gnu", name_2d = "domains.x.gnu")
+            create_tics(domainf_y, yterm, yres, name_1d = "domains_1d.y.gnu", name_2d = "domains.y.gnu")
     stages_list = None
     if ('stages' in opts):
         stage_file = open(stagef)
@@ -1870,8 +1873,8 @@ if __name__ == '__main__':
             outputpdb_y.close()
     if opts.get('pearson_inter', False) and gnus_path:
         if (asymm):
-            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.x.dat'"+";outputfile='aggregate/pearson_inter_residue.x.png';title_time='Inter-residue Pearson correlation (X)'"+'" %s/script_corr.gnu'%(gnus_path))
-            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.y.dat'"+";outputfile='aggregate/pearson_inter_residue.y.png';title_time='Inter-residue Pearson correlation (Y)'"+'" %s/script_corr.gnu'%(gnus_path))
+            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.x.dat'"+";outputfile='aggregate/pearson_inter_residue.x.png';title_time='Inter-residue Pearson correlation (X)';domain_name='domains.x.gnu'"+'" %s/script_corr.gnu'%(gnus_path))
+            os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.y.dat'"+";outputfile='aggregate/pearson_inter_residue.y.png';title_time='Inter-residue Pearson correlation (Y)';domain_name='domains.y.gnu'"+'" %s/script_corr.gnu'%(gnus_path))
         else:
             os.system('gnuplot -e "domains=%i;maxz=%f;inputfile='%(domains,trunc_dr)+"'aggregate/pearson_map_density.dat'"+";outputfile='aggregate/pearson_inter_residue.png';title_time='Inter-residue Pearson correlation'"+'" %s/script_corr.gnu'%(gnus_path))
     
