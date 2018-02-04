@@ -110,7 +110,7 @@ CONAN can perform the following types of analysis:
   - _Related input keywords:_ `BLOCKING`
   - _Output:_ `blocking/`
 - Asymmetric analysis, i.e., interactions between domains or between chains
-  - _Related input keywords:_ `START_X`, `NRES_X`, `NTERM_X`, `DOMAINS_X`, (same for `Y`), `DIMER`
+  - _Related input keywords:_ `START_X`, `NRES_X`, `NTERM_X`, `DOMAINS_X`, `LIST_X`, (same for `Y`), `DIMER`
 
 There is one more tools for contact analysis, distributed along with CONAN:
 
@@ -421,16 +421,24 @@ Instead of a symmetric run (comparing intra-chain contacts), CONAN can be used t
 ### START_X <int>
 
 The starting residue of _group X_. 1-indexed, based on what is in the XPM file.
+- _Remarks:_ An alternative is to give `LIST_X` as explained below.
 
 ### NRES_X <int>
 
 The number of residues in _group X_ (i.e., _group X_ will be `START_X` <= index `START_X` + `NRES_X` where index is 1-indexed.)
+- _Remarks:_ An alternative is to give `LIST_X` as explained below.
+
+### LIST_X <file name>
+
+A file name containing all the residues that are in the "X group". The format is very simple - all residue IDs (starting at 1!) are in a separate line. Note that CONAN will still output contiguous residues.
+
+- _Remarks:_ If the file name given by LIST_X has Nx lines, the group X will contain Nx entries.
 
 ### NTERM_X <int>
 
 The N-terminus index of _group X_ for plotting purposes and to read the sequence from the PDB (i.e., the residue IDs will be: `NTERM_X` <= resID < `NTERM_X + NRES_X`).
 
-- _Default:_ equal to `START_X`
+- _Default:_ equal to `START_X` (if that is given) or to whichever the first residue ID is in the `LIST_X` given.
 
 ### DOMAINS_X <file name>
 
