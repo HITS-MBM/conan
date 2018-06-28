@@ -1654,9 +1654,10 @@ def read_options(finput, opts):
         if ('shadow' in opts):
             print("Removing shadows is impossible in an asymmetric run.")
             opts.pop('shadow')
-        if ('k_clusters' in opts):
+        if ('k_res_clusters' in opts):
             print("Clustering residues is impossible in an asymmetric run.")
-            opts.pop('k_clusters')
+            opts.pop('k_res_clusters')
+            opts.pop('ks_res')
         if ('list_x' in opts):
             reslistx = np.loadtxt(opts['list_x'], dtype = int)
             opts['xterm'] = opts.get('xterm', reslistx[0]) 
