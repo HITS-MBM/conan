@@ -3,7 +3,7 @@ Requirements
 
 In order to successfully run CONAN you need to have working installations of:
 
- - Python 3, with numpy and scipy installed. (Anaconda 3+ recommended).
+ - Python 3, with numpy and scipy installed. (Anaconda 3+ recommended). Using an older version of scipy can cause an error in testing. The error will read something like: ValueError: Valid methods when the raw observations are omitted are 'single', 'complete', 'weighted', and 'average'. If you are NOT interestred in cluster analysis, feel free to ignore this error in testing.
  - GROMACS molecular dynamics engine, version 5.0 or later. GROMACS can be downloaded from the official website. (NB: GROMACS is only used for the first step of analysis, the MD trajectory can be obtained by other programs too.)
  - Gnuplot plotting tool. It can be downloaded from the official website.
  - Mencoder is obtained through MPlayer, which can be found on the official website.
@@ -37,7 +37,7 @@ You can test your CONAN distribution by:
     cd test/
     ./test.py
 
-And read the results on the screen. The test script cleans up after itself, unless there are errors.
+And read the results on the screen. The test script cleans up after itself, unless there are errors. Please note the previous remark -- older versions of Scipy are known to return a ValueError on cluster analysis.
 
 CONAN tutorials
 -------------
