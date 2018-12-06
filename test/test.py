@@ -21,8 +21,11 @@ def which(program):
 
 def cleanup():
   for y in os.listdir("."):
-    if os.path.isdir(y) and y!="correct_output" and y!="to_read":
-      os.system("rm -r %s"%y)
+    if os.path.isdir(y):
+      if y!="correct_output" and y!="to_read":
+        os.system("rm -r %s"%y)
+    elif y!="test.inp" and y[-3:]!="dat":
+      os.system("rm '%s'"%y)
 
 print ("Welcome to the CONAN test script. Fingers crossed!")
 for prog in ["gmx", "mencoder", "gnuplot"]:
@@ -45,7 +48,6 @@ if (i==0):
   print ("PASSED")
 else:
   print ("FAILED")
-cleanup()
 i = 1
 tests = []
 os.chdir("..")
@@ -55,6 +57,11 @@ for x in os.listdir("."):
 tests.sort()
 total_fails = 0
 failures = []
+print("Removing files from old tests...")
+for test in tests:
+  os.chdir(test)
+  cleanup()
+  os.chdir("..")
 for test in tests:
   os.chdir(test)
   i += 1
@@ -76,7 +83,8 @@ for test in tests:
 
 if (total_fails == 0):
   print("All tests passed! Everything looks good.")
-  os.system("rm 1_ReadWrite/{dmf.xpm,dm.xpm}")
+  os.chdir("1_ReadWrite/")
+  cleanup()
 else:
   print("%i test(s) failed. The output of the failed tests has been preserved."%len(failures))
   print("It is possible that the deviations are minor.")
