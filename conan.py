@@ -64,7 +64,7 @@ def read_in_observables(inputf, time_vec):
             if (ntitles == -1):
                 ntitles = int(line.split()[0])
             elif (len(titles)<ntitles):
-                title = line
+                title = line[:-1]
                 titles.append(title)
             else:
                 t = int(float(line.split()[0]))
@@ -110,7 +110,7 @@ def read_in_observables_blind(inputf):
             if (ntitles == -1):
                 ntitles = int(line.split()[0])
             elif (len(titles)<ntitles):
-                title = line
+                title = line[:-1]
                 titles.append(title)
             else:
                 if (not obs_vec):
@@ -1585,7 +1585,10 @@ def read_options(finput, opts):
                 opts['shadow'] = True
                 opts['shadow_tol'] = float(val)
             elif key == 'PCA_MAKE':
-                opts['pca_make'] = int(val)
+                if (not val.isdigit()) or (int(val) < 1):
+                  print("The correct call of PCA is PCA_MAKE <# PCs>, where <# PCs> is an integer defining the number of PCs to output.")
+                else:
+                  opts['pca_make'] = int(val)
             elif key == 'PCA_READ':
                 opts['pca_dir'] = str(val)
             elif key == 'PEARSON_OBS':
