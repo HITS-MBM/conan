@@ -2,6 +2,7 @@
 import numpy as np
 import sys
 import os
+from subprocess import DEVNULL, STDOUT, call, run, Popen
 
 def which(program):
 # This function checks for the existence of an executable
@@ -42,8 +43,8 @@ for prog in ["gmx", "mencoder", "gnuplot"]:
 
 print ("Test 1: I/O, Result: ", end = '')
 os.chdir("1_ReadWrite") # the first test, getting us the actual data.
-os.system("echo 2 | ../../conan.py test.inp > /dev/null >& /dev/null")
-i = os.system("../compare_all.py ")
+run("../../conan.py test.inp".split(), stderr = STDOUT, stdout = DEVNULL, input = b"2\n")
+i = run(["../compare_all.py"]).returncode
 if (i==0):
   print ("PASSED")
 else:
@@ -68,9 +69,9 @@ for test in tests:
   inpf = open("test.inp")
   header = inpf.readline()
   print ("Test %i: %s... "%(i, header[1:-1]), end = '')
-  os.system("ln -s ../1_ReadWrite/dmf.xpm .")
-  os.system("../../conan.py test.inp > /dev/null >& /dev/null")
-  e = os.system("python ../compare_all.py")
+  run("ln -s ../1_ReadWrite/dmf.xpm .".split())
+  run("../../conan.py test.inp".split(), stderr = STDOUT, stdout = DEVNULL, input = b"2\n")
+  e = run("python ../compare_all.py".split()).returncode
   if (e==0):
     print ("PASSED")
     os.system("rm dmf.xpm")
